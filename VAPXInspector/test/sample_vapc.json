@@ -1,0 +1,51 @@
+{
+  "info": {
+    "v": 2,
+    "f": 100,
+    "w": 720,
+    "h": 1280,
+    "videoW": 720,
+    "videoH": 1600,
+    "fps": 20,
+    "isVapx": 1,
+    "rgbFrame": [0, 0, 720, 1280],
+    "aFrame": [0, 1280, 720, 320]
+  },
+  "src": [
+    {
+      "srcId": "1",
+      "srcType": "img",
+      "loadType": "net",
+      "srcTag": "[imgUser]",
+      "w": 120,
+      "h": 120,
+      "fitType": "centerCrop"
+    },
+    {
+      "srcId": "2",
+      "srcType": "txt",
+      "loadType": "local",
+      "srcTag": "[txtName]",
+      "w": 240,
+      "h": 56,
+      "color": "#FFFFFF",
+      "style": "b"
+    }
+  ],
+  "frame": [
+    {
+      "i": 0,
+      "obj": [
+        {"srcId":"1","z":1,"frame":[280,420,120,120],"mFrame":[0,1280,120,120]},
+        {"srcId":"2","z":2,"frame":[240,560,240,56],"mFrame":[120,1280,240,56]}
+      ]
+    },
+    {
+      "i": 50,
+      "obj": [
+        {"srcId":"1","z":1,"frame":[300,400,120,120],"mFrame":[0,1280,120,120]},
+        {"srcId":"2","z":2,"frame":[220,550,280,64],"mFrame":[120,1280,280,64]}
+      ]
+    }
+  ]
+}
