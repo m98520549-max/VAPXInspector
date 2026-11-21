@@ -1,0 +1,56 @@
+
+name: Build Windows portable VAPX Inspector
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install Qt 6
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          host: windows
+          target: desktop
+          arch: win64_msvc2022_64
+          modules: qtmultimedia
+          cache: true
+
+      - name: Configure
+        shell: pwsh
+        run: cmake -S VAPXInspector -B VAPXInspector/build -G "Visual Studio 17 2022" -A x64 "-DCMAKE_PREFIX_PATH=$env:QT_ROOT_DIR"
+
+      - name: Build Release
+        run: cmake --build VAPXInspector/build --config Release --parallel
+
+      - name: Assemble portable folder
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $src = Join-Path $PWD 'VAPXInspector'
+          $exe = Join-Path $src 'build/Release/VAPXInspector.exe'
+          if (!(Test-Path $exe)) { throw "Executable not found: $exe" }
+          $out = Join-Path $PWD 'VAPXInspector-Portable'
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          Copy-Item $exe $out
+          Copy-Item (Join-Path $src 'README.md') $out
+          Copy-Item -Recurse (Join-Path $src 'test') $out
+          $windeployqt = Join-Path $env:QT_ROOT_DIR 'bin/windeployqt.exe'
+          & $windeployqt --release --compiler-runtime --dir $out $exe
+          if ($LASTEXITCODE -ne 0) { throw "windeployqt failed" }
+          Compress-Archive -Path (Join-Path $out '*') -DestinationPath (Join-Path $PWD 'VAPXInspector-Windows-Portable.zip') -Force
+
+      - name: Upload portable ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: VAPXInspector-Windows-Portable
+          path: VAPXInspector-Windows-Portable.zip
+          if-no-files-found: error
+          retention-days: 14
