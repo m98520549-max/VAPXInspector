@@ -129,6 +129,7 @@ void MainWindow::openJson() {
 }
 
 void MainWindow::loadDocument(const QJsonObject& config, const QString&) {
+    m_bindings.clear();
     m_config = config;
     const QJsonObject info = config.value("info").toObject();
     m_fps = info.value("fps").toDouble(20.0);
@@ -151,7 +152,7 @@ void MainWindow::populateSources() {
         const auto o=src[i].toObject();
         const QString tag=normalizeTag(o.value("srcTag").toString());
         const QString id=o.value("srcId").toVariant().toString();
-        const bool loaded=m_bindings.value(tag).isSet;
+        const bool loaded=m_bindings.value(id).isSet;
         m_sources->setItem(i,0,new QTableWidgetItem(o.value("srcType").toString()));
         m_sources->setItem(i,1,new QTableWidgetItem(id));
         m_sources->setItem(i,2,new QTableWidgetItem(o.value("srcTag").toString()));
@@ -168,7 +169,7 @@ QString MainWindow::normalizeTag(QString tag) const {
 QString MainWindow::currentTag() const {
     const int row=m_sources->currentRow();
     if(row<0) return {};
-    return normalizeTag(m_sources->item(row,2)->text());
+    return m_sources->item(row,1)->text().trimmed();
 }
 void MainWindow::selectSource() {
     const QString tag=currentTag();
